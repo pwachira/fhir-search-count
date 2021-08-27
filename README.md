@@ -17,7 +17,7 @@ A Java Commandline application that allows searching/counting for a patient from
 - Install gradle (using version 7.2 at time of creating project)
   - example ```brew install gradle```
 - You might need to initialize gradle wrapper ```gradle wrapper```
-- run ```./gradlew build -x test``` 
+- run ```./gradlew build -x test``` . Test results html page will then be at build/reports/tests/test/classes/com.uphealth.fhirsearch.FhirTests.html
 - test the setup ```./gradlew test``` . Make sure the test database is accessible for this.
   - There is a test to verify loading of files to a table
   - There is a test to verify searching for a patient that not in the top level resource but in a referenced resource

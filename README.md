@@ -47,4 +47,6 @@ Each resource adapter has a reference to its fhir resource object
 To allow searching for a patient in a referenced resource, a breadth first search is used with a specified
 depth parameter. The default value for depth is 1, meaning 1 level removed from the resource being searched.
 
-- TODO: Implement a taskexecutor to allow multithreaded search to improve performance 
+- TODO:
+ - complete creating all adapters. Currently only searching 8 resource types.
+ - Implement a taskexecutor to allow multithreaded search to improve performance 

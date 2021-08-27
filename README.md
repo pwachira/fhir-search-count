@@ -49,4 +49,5 @@ depth parameter. The default value for depth is 1, meaning 1 level removed from 
 
 - TODO:
  - complete creating all adapters. Currently only searching 8 resource types.
+ - Add a middle step to save only needed 3 fields (resource ids, subject, referenxes) in a table to bypass expensive deserialization during the actual search. 
  - Implement a taskexecutor to allow multithreaded search to improve performance 

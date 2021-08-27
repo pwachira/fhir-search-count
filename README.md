@@ -25,8 +25,8 @@ A Java Commandline application that allows searching/counting for a patient from
 ## Run
 - To load files to the db, run
     - ``` java -jar -Dspring.profiles.active=load  build/libs/fhir-search-0.0.1-SNAPSHOT.jar``` 
--To search for a patient using a resource id, run
- ```java -jar -Dspring.profiles.active=search  build/libs/fhir-search-0.0.1-SNAPSHOT.jar c4768f2a-f932-4ab6-a4a5-6e8ae0f9da8d``` 
+- To search for a patient using a resource id, run
+  - ```java -jar -Dspring.profiles.active=search  build/libs/fhir-search-0.0.1-SNAPSHOT.jar c4768f2a-f932-4ab6-a4a5-6e8ae0f9da8d``` 
      
 ## Implementation Notes
 The application loads the fhir resources as text type into postgresql with the following schema;

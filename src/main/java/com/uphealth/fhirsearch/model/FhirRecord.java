@@ -1,8 +1,12 @@
 package com.uphealth.fhirsearch.model;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Data
@@ -14,9 +18,8 @@ public class FhirRecord {
     Long id;
     String resourceId;
     String type;
-    @Lob
-    String body;
-
+    @JdbcTypeCode( SqlTypes.JSON )
+    JsonNode body;
     public FhirRecord(){
 
     }

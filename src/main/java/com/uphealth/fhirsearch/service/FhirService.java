@@ -2,8 +2,11 @@ package com.uphealth.fhirsearch.service;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uphealth.fhirsearch.model.*;
 import com.uphealth.fhirsearch.model.adapters.*;
+import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +18,7 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -24,13 +28,14 @@ import java.util.stream.Collectors;
 import static java.util.Map.entry;
 
 @Service
+@Slf4j
 public class FhirService {
 
     private final FhirRepository fhirRepository;
     private final FhirContext fhirContext;
     private final IParser parser;
     private  final Map<String,Function<String,IFhirAdapter>> adapterMap ;
-
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     public FhirService(FhirRepository fhirRepository, FhirContext fhirContext){
@@ -63,7 +68,7 @@ public class FhirService {
                 String id = parser.parseResource(resource).getIdElement().toString();
                 FhirRecord record = new FhirRecord().builder()
                         .resourceId(id)
-                        .body(resource)
+                        .body(mapper.readTree(resource))
                         .type(file)
                         .build();
                 records.add(record);
@@ -74,7 +79,9 @@ public class FhirService {
 /*
     Searches for
  */
-    public int patientCountForType(String patientId, String type, int searchDepth) {
+    @Async
+    public CompletableFuture<Void> patientCountForType(
+            String patientId, String type, int searchDepth, ConcurrentMap<String,Integer> result) {
         var recordList  = fhirRepository.findFhirRecordByType(type);
         var pathExists =new HashMap<String,Integer>();
         //bfs for each
@@ -91,7 +98,7 @@ public class FhirService {
                 if(level.get(queue.peek().getResourceId()) > searchDepth) break;
 
                 var popped = queue.remove();
-                var adapter = adapterMap.get(popped.getType()).apply(popped.getBody());
+                var adapter = adapterMap.get(popped.getType()).apply(popped.getBody().toString());
                 if (adapter.getSubject().equals(patientId)){
                     pathExists.put(popped.getResourceId(), 1);
                 } else {
@@ -105,7 +112,11 @@ public class FhirService {
                 }
             }
         }
-        return pathExists.values().stream().reduce(0,Integer::sum);
+        int count = pathExists.values().stream().reduce(0,Integer::sum);
+        result.put(type, count);
+        log.info(String.format("type: %s has count %d",type, count ));
+        return CompletableFuture.completedFuture(null);
+
     }
 
     public List<String> getAllResourceTypes() {

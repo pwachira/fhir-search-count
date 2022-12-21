@@ -17,7 +17,7 @@ A Java Commandline application that allows searching/counting for a patient from
 - Install gradle (using version 7.2 at time of creating project)
   - example ```brew install gradle```
 - You might need to initialize gradle wrapper ```gradle wrapper```
-- run ```./gradlew build -x test``` 
+- run ```./gradlew build -x test``` . Test results html page will then be at build/reports/tests/test/classes/com.uphealth.fhirsearch.FhirTests.html
 - test the setup ```./gradlew test``` . Make sure the test database is accessible for this.
   - There is a test to verify loading of files to a table
   - There is a test to verify searching for a patient that not in the top level resource but in a referenced resource
@@ -47,4 +47,7 @@ Each resource adapter has a reference to its fhir resource object
 To allow searching for a patient in a referenced resource, a breadth first search is used with a specified
 depth parameter. The default value for depth is 1, meaning 1 level removed from the resource being searched.
 
-- TODO: Implement a taskexecutor to allow multithreaded search to improve performance 
+- TODO:
+ - complete creating all adapters. Currently only searching 8 resource types.
+ - Add a middle step to save only needed 3 fields (resource ids, subject, referenxes) in a table to bypass expensive deserialization during the actual search. 
+ - Implement a taskexecutor to allow multithreaded search to improve performance 

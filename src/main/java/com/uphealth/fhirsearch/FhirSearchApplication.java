@@ -24,13 +24,12 @@ import java.util.concurrent.Executor;
 
 
 @SpringBootApplication
-//@EnableAsync
+@EnableAsync
 public class FhirSearchApplication  {
 
-    private static final Logger logger = LoggerFactory.getLogger(FhirSearchApplication.class);
 
     public static void main(String[] args) {
-        SpringApplication.run(FhirSearchApplication.class, args);
+        SpringApplication.run(FhirSearchApplication.class, args).close();
     }
 
     @Bean
@@ -38,15 +37,16 @@ public class FhirSearchApplication  {
         return FhirContext.forR4();
     }
 
-/*
+
     @Bean(name = "threadPoolTaskExecutor")
     public Executor threadPoolTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(25);
-        executor.setMaxPoolSize(50);
-        executor.setQueueCapacity(250);
+        executor.setCorePoolSize(8);
+        executor.setMaxPoolSize(8);
+        executor.setQueueCapacity(32);
         executor.initialize();
         return executor;
     }
-*/
+
+
 }

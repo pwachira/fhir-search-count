@@ -3,6 +3,8 @@ package com.uphealth.fhirsearch;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.parser.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uphealth.fhirsearch.model.FhirRecord;
 import com.uphealth.fhirsearch.model.FhirRepository;
 import com.uphealth.fhirsearch.service.FhirService;
@@ -17,6 +19,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -39,6 +44,7 @@ class FhirTests {
     @Autowired
     private FhirService service;
 
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
     void init(){
@@ -60,15 +66,21 @@ class FhirTests {
 
 
     @Test
-    void can_search_references(){
-        fhirRepository.save(new FhirRecord().builder().resourceId("CarePlan/2").type("CarePlan.ndjson").body(CARE_PLAN).build());
-        fhirRepository.save(new FhirRecord().builder().resourceId("Patient/1").type("Patient.ndjson").body(PATIENT).build());
-        fhirRepository.save(new FhirRecord().builder().resourceId("Encounter/3").type("Encounter.ndjson").body(ENCOUNTER_INDIRECT).build());
+    void can_search_references() throws JsonProcessingException, ExecutionException, InterruptedException {
+        fhirRepository.save(new FhirRecord().builder().resourceId("CarePlan/2").type("CarePlan.ndjson")
+                .body(mapper.readTree(CARE_PLAN)).build());
+        fhirRepository.save(new FhirRecord().builder().resourceId("Patient/1").type("Patient.ndjson")
+                .body(mapper.readTree(PATIENT)).build());
+        fhirRepository.save(new FhirRecord().builder().resourceId("Encounter/3").type("Encounter.ndjson")
+                .body(mapper.readTree(ENCOUNTER_INDIRECT)).build());
 
-        var result0 = service.patientCountForType("Patient/1","CarePlan.ndjson",0);
-        assertThat(result0,is(0));
-        var result1 = service.patientCountForType("Patient/1","CarePlan.ndjson",1);
-        assertThat(result1,is(1));
+        ConcurrentMap<String,Integer> result = new ConcurrentHashMap<>();
+        var result0 = service.patientCountForType(
+                "Patient/1","CarePlan.ndjson",0, result).get();
+        assertThat(result.get("CarePlan.ndjson"),is(0));
+        var result1 = service.patientCountForType(
+                "Patient/1","CarePlan.ndjson",1,result).get();
+        assertThat(result.get("CarePlan.ndjson"),is(1));
     }
 
 }

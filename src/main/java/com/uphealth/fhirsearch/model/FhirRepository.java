@@ -12,19 +12,18 @@ import java.util.List;
 public interface FhirRepository extends CrudRepository<FhirRecord,Long> {
 
     @Query(value="select count(r) from FhirRecord r where r.resourceId = ?1 and r.type = ?2")
-    public int countByIdAndType(String id,String type);
+    int countByIdAndType(String id,String type);
 
     @Query(value = "select distinct f.type from FhirRecord f")
-    public List <String> getTypes();
+    List <String> getTypes();
 
     @Transactional(readOnly = true)
-    public List<FhirRecord> findFhirRecordByType(String type);
+    List<FhirRecord> findFhirRecordByType(String type);
 
     @Transactional(readOnly = true)
-    public List<FhirRecord> findFhirRecordByResourceId(String type);
+    List<FhirRecord> findFhirRecordByResourceId(String type);
 
     @Transactional(readOnly = true)
     @Query(value="select r from FhirRecord r where r.resourceId in :ids")
-    @Cacheable(value = "fhir_records")
-    public List<FhirRecord> findByListOfResourceIds(@Param("ids") List<String> resourceIds);
+    List<FhirRecord> findByListOfResourceIds(@Param("ids") List<String> resourceIds);
 }

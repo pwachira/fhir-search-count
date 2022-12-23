@@ -4,11 +4,9 @@ A Java Commandline application that allows searching/counting for a patient from
 - Run postgres locally on port 5432 wiht user postgres and password postgres.
 - create 2 databases:
   - oneuphealth
-  - oneuphealth_test
   - For convenience, consider running a docker postgres image with 
     - ```docker run --name postgres  --env POSTGRES_PASSWORD=postgres -itd --rm -p5432:5432  postgres```
     - ```CREATE DATABASE oneuphealth```
-    - ```CREATE DATABASE oneuphealth_test```
     
 
 - Checkout the code
@@ -18,7 +16,7 @@ A Java Commandline application that allows searching/counting for a patient from
   - example ```brew install gradle```
 - You might need to initialize gradle wrapper ```gradle wrapper```
 - run ```./gradlew build -x test``` . Test results html page will then be at build/reports/tests/test/classes/com.uphealth.fhirsearch.FhirTests.html
-- test the setup ```./gradlew test``` . Make sure the test database is accessible for this.
+- test the setup ```./gradlew test```
   - There is a test to verify loading of files to a table
   - There is a test to verify searching for a patient that not in the top level resource but in a referenced resource
   
@@ -50,4 +48,3 @@ depth parameter. The default value for depth is 1, meaning 1 level removed from 
 - TODO:
  - complete creating all adapters. Currently only searching 8 resource types.
  - Add a middle step to save only needed 3 fields (resource ids, subject, referenxes) in a table to bypass expensive deserialization during the actual search. 
- - Implement a taskexecutor to allow multithreaded search to improve performance 
